@@ -47,7 +47,8 @@ def updateProduct(product_id,name,description, company, price,units, subcategory
         clientDB = db_client() #Abrimos un cliente , que establece la conexión con la base de datos
         cur = clientDB.cursor()#Abrimos un cursor para hacer consultas y querys a la BD
         cur.execute(f"""update product
-                    set name='{name}',description='{description}', company='{company}', price={price},units={units}, subcategory_id={subcategory_id}, created_at=CURRENT_TIMESTAMP, updated_at=CURRENT_TIMESTAMP  
+                    set 
+                    name='{name}',description='{description}', company='{company}', price={price},units={units}, subcategory_id={subcategory_id}, created_at=CURRENT_TIMESTAMP, updated_at=CURRENT_TIMESTAMP  
                     where product_id={product_id}""") #Ejecutamos la consulta
         clientDB.commit()
     except Exception as e:
@@ -108,13 +109,17 @@ def insertCategory():
             nombre_categoria=item['name_category']
 
             #Comprobación de si existe este item en la BD
-            cur.execute(f"""SELECT * FROM category where category_id = {id_categoria}""")
+            cur.execute(f"""SELECT * 
+                        FROM category 
+                        where category_id = {id_categoria}""")
             validationQuery = cur.fetchone()
 
             #Si no existe se hace un insert
             if not validationQuery:
-                insert= (f"""INSERT INTO category( category_id, name, created_at, updated_at)
-                    VALUES ({id_categoria}, '{nombre_categoria}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);""")   
+                insert= (f"""INSERT INTO category
+                         ( category_id, name, created_at, updated_at)
+                        VALUES
+                        ({id_categoria}, '{nombre_categoria}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);""")   
                 cur.execute(insert) 
             
             clientDB.commit()
@@ -166,15 +171,16 @@ def insertProducts():
             #Comprobación de si existe este item en la BD
             cur.execute(f"""SELECT * FROM product where product_id  = {id_prod}""")
             validationQuery = cur.fetchone()
-
+            #Si existe hacemos un update 
+            if(validationQuery):
+                updateProduct(id_prod,nom_prod,descripcion,company,precio,unid,subcategory_id)
             #Si no existe se hace un insert
-            if not validationQuery:
+            else:
                 insert= (f"""INSERT INTO product(
 	                        product_id, name, description, company, price, units, subcategory_id, created_at, updated_at)
 	                        VALUES ({id_prod}, '{nom_prod}', '{descripcion}', '{company}', {precio}, {unid}, {subcategory_id}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);""")
                 cur.execute(insert)     
                 clientDB.commit()
-       
     except Exception as e:
       clientDB.rollback()
       print('Error : ', e)    
@@ -184,4 +190,3 @@ def insertProducts():
 # insertCategory()
 # insertSubCategory()
 # insertProducts()
-#deleteProduct(1005) Me funciona el servicio a mano, no me funciona 

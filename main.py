@@ -84,7 +84,7 @@ def getProductAll():
 
 #CargaMasiva de Productos
 @app.post("/loadProducts/")
-def insertItemsCSVToDB():
+async def insertItemsCSVToDB():
     try:
         insertCategory()
         insertSubCategory()
